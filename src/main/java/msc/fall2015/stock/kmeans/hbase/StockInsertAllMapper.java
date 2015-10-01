@@ -21,11 +21,8 @@
 
 package msc.fall2015.stock.kmeans.hbase;
 
-import java.io.IOException;
-
 import msc.fall2015.stock.kmeans.hbase.utils.Constants;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -35,14 +32,14 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 
-public class HBaseKVMapper extends
+
+public class StockInsertAllMapper extends
         Mapper<LongWritable, Text, ImmutableBytesWritable, Put> {
 
     private static final Logger log = LoggerFactory.getLogger(HBaseBulkDataLoader.class);
     String tableName = "";
-    ImmutableBytesWritable hKey = new ImmutableBytesWritable();
-    KeyValue kv;
 
     /** {@inheritDoc} */
     @Override

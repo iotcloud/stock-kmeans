@@ -47,10 +47,6 @@ public class HBaseBulkDataLoader {
     public static void main(String[] args) {
         try {
             Configuration configuration =  HBaseConfiguration.create();
-            configuration.set("hbase.zookeeper.quorum", "156.56.179.122");
-            configuration.set("hbase.zookeeper.property.clientPort","2181");
-            configuration.set("hbase.master", "156.56.179.122:16010");
-            configuration.set("hbase.rootdir","hdfs://156.56.179.122:9000/hbase");
             HBaseAdmin.checkHBaseAvailable(configuration);
             Connection connection = ConnectionFactory.createConnection(configuration);
 
@@ -72,7 +68,7 @@ public class HBaseBulkDataLoader {
             }
             // Load hbase-site.xml
             HBaseConfiguration.addHbaseResources(configuration);
-            Job job = configureJob(configuration);
+            Job job = configureInsertPerYearJob(configuration);
             job.waitForCompletion(true);
         } catch (InterruptedException e) {
             log.error(e.getMessage(), e);
@@ -89,11 +85,27 @@ public class HBaseBulkDataLoader {
         }
     }
 
-    public static Job configureJob(Configuration configuration) throws IOException {
+    public static Job configureInsertAllJob(Configuration configuration) throws IOException {
         Job job = new Job(configuration, "HBase Bulk Import Example");
-        job.setJarByClass(HBaseKVMapper.class);
+        job.setJarByClass(StockInsertAllMapper.class);
 
-        job.setMapperClass(HBaseKVMapper.class);
+        job.setMapperClass(StockInsertAllMapper.class);
+        job.setMapOutputKeyClass(ImmutableBytesWritable.class);
+        job.setMapOutputValueClass(KeyValue.class);
+
+        job.setInputFormatClass(TextInputFormat.class);
+        FileInputFormat.addInputPath(job, new Path(Constants.HBASE_INPUT_PATH));
+        FileOutputFormat.setOutputPath(job, new Path(Constants.HBASE_OUTPUT_PATH));
+        TableMapReduceUtil.initTableReducerJob(Constants.STOCK_TABLE_NAME, null, job);
+        job.setNumReduceTasks(0);
+        return job;
+    }
+
+    public static Job configureInsertPerYearJob(Configuration configuration) throws IOException {
+        Job job = new Job(configuration, "HBase Bulk Import Example");
+        job.setJarByClass(StockInsertPerYearMapper.class);
+
+        job.setMapperClass(StockInsertPerYearMapper.class);
         job.setMapOutputKeyClass(ImmutableBytesWritable.class);
         job.setMapOutputValueClass(KeyValue.class);
 
