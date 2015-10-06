@@ -23,9 +23,6 @@ package msc.fall2015.stock.kmeans.hbase;
 
 import msc.fall2015.stock.kmeans.hbase.utils.Constants;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.client.Put;
-import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -36,19 +33,9 @@ import java.io.IOException;
 
 
 public class StockInsertAllMapper extends
-        Mapper<LongWritable, Text, ImmutableBytesWritable, Put> {
+        Mapper<LongWritable, Text, Text, Text> {
 
     private static final Logger log = LoggerFactory.getLogger(HBaseBulkDataLoader.class);
-    String tableName = "";
-
-    /** {@inheritDoc} */
-    @Override
-    protected void setup(Context context) throws IOException,
-            InterruptedException {
-        Configuration c = context.getConfiguration();
-
-        tableName = c.get(Constants.STOCK_TABLE_NAME);
-    }
 
     /** {@inheritDoc} */
     @Override
@@ -56,8 +43,7 @@ public class StockInsertAllMapper extends
             throws IOException, InterruptedException {
 
         String[] fields = null;
-        long counterVal = context.getCounter("HBaseKVMapper", "NUM_MSGS").getValue();
-        System.out.println(counterVal);
+        String id = null, symbol= null, date= null, cap= null, price = null, rowKey = null, rowVal = null;
         try {
             fields = value.toString().split(",");
         } catch (Exception ex) {
@@ -65,33 +51,33 @@ public class StockInsertAllMapper extends
             return;
         }
 
-        byte[] rowKey = Bytes.toBytes(counterVal);
-        Put row = new Put(rowKey);
         if (fields.length > 0 && fields[0] != null && !fields[0].equals("")) {
-            row.add(Constants.STOCK_TABLE_CF_BYTES,
-                    Constants.ID_COLUMN_BYTES, Bytes.toBytes(fields[0]));
+            id = fields[0];
         }
 
         if (fields.length > 1 && fields[1] != null && !fields[1].equals("")) {
-            row.add(Constants.STOCK_TABLE_CF_BYTES,
-                    Constants.DATE_COLUMN_BYTES, Bytes.toBytes(fields[1]));
+            date = fields[1];
         }
 
         if (fields.length > 2 && fields[2] != null && !fields[2].equals("")) {
-            row.add(Constants.STOCK_TABLE_CF_BYTES,
-                    Constants.SYMBOL_COLUMN_BYTES, Bytes.toBytes(fields[2]));
+            symbol = fields[2];
         }
 
         if (fields.length > 3 && fields[3] != null && !fields[3].equals("")) {
-            row.add(Constants.STOCK_TABLE_CF_BYTES,
-                    Constants.PRICE_COLUMN_BYTES, Bytes.toBytes(fields[3]));
+            price = fields[3];
         }
 
         if (fields.length > 4 && fields[4] != null && !fields[4].equals("")) {
-            row.add(Constants.STOCK_TABLE_CF_BYTES,
-                    Constants.CAP_COLUMN_BYTES, Bytes.toBytes(fields[4]));
+            cap = fields[4];
         }
-        context.write(new ImmutableBytesWritable(rowKey), row);
+        if (id != null && symbol != null){
+            rowKey = id + "_" + symbol;
+            rowVal = date + "_" + price + "_" + cap;
+            log.info("Mapper : rowKey : " + rowKey);
+            log.info("Mapper : rowVal : " + rowVal);
+            context.write(new Text(rowKey), new Text(rowVal));
+        }
+
         context.getCounter("HBaseKVMapper", "NUM_MSGS").increment(1);
     }
 }

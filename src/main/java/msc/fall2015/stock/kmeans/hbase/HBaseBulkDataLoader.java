@@ -68,7 +68,7 @@ public class HBaseBulkDataLoader {
             }
             // Load hbase-site.xml
             HBaseConfiguration.addHbaseResources(configuration);
-            Job job = configureInsertPerYearJob(configuration);
+            Job job = configureInsertAllJob(configuration);
             job.waitForCompletion(true);
         } catch (InterruptedException e) {
             log.error(e.getMessage(), e);
@@ -90,6 +90,7 @@ public class HBaseBulkDataLoader {
         job.setJarByClass(StockInsertAllMapper.class);
 
         job.setMapperClass(StockInsertAllMapper.class);
+        job.setReducerClass(StockInsertReducer.class);
         job.setMapOutputKeyClass(ImmutableBytesWritable.class);
         job.setMapOutputValueClass(KeyValue.class);
 
@@ -97,7 +98,7 @@ public class HBaseBulkDataLoader {
         FileInputFormat.addInputPath(job, new Path(Constants.HBASE_INPUT_PATH));
         FileOutputFormat.setOutputPath(job, new Path(Constants.HBASE_OUTPUT_PATH));
         TableMapReduceUtil.initTableReducerJob(Constants.STOCK_TABLE_NAME, null, job);
-        job.setNumReduceTasks(0);
+//        job.setNumReduceTasks(0);
         return job;
     }
 
