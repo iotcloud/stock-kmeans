@@ -25,6 +25,7 @@ import msc.fall2015.stock.kmeans.hbase.utils.Constants;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
+import org.apache.hadoop.hbase.mapreduce.TableReducer;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -33,7 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class StockInsertReducer extends Reducer<Text, Text, ImmutableBytesWritable, Put> {
+public class StockInsertReducer extends TableReducer<Text, Text, ImmutableBytesWritable> {
     private static final Logger log = LoggerFactory.getLogger(StockInsertReducer.class);
     String tableName = "";
     @Override

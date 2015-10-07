@@ -21,8 +21,6 @@
 
 package msc.fall2015.stock.kmeans.hbase;
 
-import msc.fall2015.stock.kmeans.hbase.utils.Constants;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -33,9 +31,14 @@ import java.io.IOException;
 
 
 public class StockInsertAllMapper extends
-        Mapper<LongWritable, Text, Text, Text> {
+        Mapper<LongWritable, Text, Text, Text   > {
 
     private static final Logger log = LoggerFactory.getLogger(HBaseBulkDataLoader.class);
+
+    @Override
+    protected void setup(Context context) throws IOException, InterruptedException {
+        super.setup(context);
+    }
 
     /** {@inheritDoc} */
     @Override

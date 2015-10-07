@@ -32,6 +32,7 @@ import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
@@ -90,14 +91,14 @@ public class HBaseBulkDataLoader {
         job.setJarByClass(StockInsertAllMapper.class);
 
         job.setMapperClass(StockInsertAllMapper.class);
-        job.setReducerClass(StockInsertReducer.class);
-        job.setMapOutputKeyClass(ImmutableBytesWritable.class);
-        job.setMapOutputValueClass(KeyValue.class);
+        TableMapReduceUtil.initTableReducerJob(Constants.STOCK_TABLE_NAME, StockInsertReducer.class, job);
+        //job.setReducerClass(StockInsertReducer.class);
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(Text.class);
 
         job.setInputFormatClass(TextInputFormat.class);
         FileInputFormat.addInputPath(job, new Path(Constants.HBASE_INPUT_PATH));
         FileOutputFormat.setOutputPath(job, new Path(Constants.HBASE_OUTPUT_PATH));
-        TableMapReduceUtil.initTableReducerJob(Constants.STOCK_TABLE_NAME, null, job);
 //        job.setNumReduceTasks(0);
         return job;
     }
