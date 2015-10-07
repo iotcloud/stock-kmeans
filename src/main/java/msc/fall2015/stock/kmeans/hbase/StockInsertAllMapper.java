@@ -76,8 +76,8 @@ public class StockInsertAllMapper extends
         if (id != null && symbol != null){
             rowKey = id + "_" + symbol;
             rowVal = date + "_" + price + "_" + cap;
-            log.info("Mapper : rowKey : " + rowKey);
-            log.info("Mapper : rowVal : " + rowVal);
+//            log.info("Mapper : rowKey : " + rowKey);
+//            log.info("Mapper : rowVal : " + rowVal);
             context.write(new Text(rowKey), new Text(rowVal));
         }
 
