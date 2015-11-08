@@ -239,12 +239,14 @@ public class HBaseDataInserter {
     }
     public static void printRow(Result result) {
         String returnString = "";
-        returnString += Bytes.toString(result.getValue(Constants.STOCK_TABLE_CF_BYTES, Constants.ID_COLUMN_BYTES)) + ", ";
-        returnString += Bytes.toString(result.getValue(Constants.STOCK_TABLE_CF_BYTES, Constants.DATE_COLUMN_BYTES)) + ", ";
-        returnString += Bytes.toString(result.getValue(Constants.STOCK_TABLE_CF_BYTES, Constants.SYMBOL_COLUMN_BYTES)) + ", ";
-        returnString += Bytes.toString(result.getValue(Constants.STOCK_TABLE_CF_BYTES, Constants.PRICE_COLUMN_BYTES)) + ", ";
-        returnString += Bytes.toString(result.getValue(Constants.STOCK_TABLE_CF_BYTES, Constants.CAP_COLUMN_BYTES));
-        System.out.println(returnString);
+        String rowName = Bytes.toString(result.getRow());
+
+//        returnString += Bytes.toString(result.getValue(Constants.STOCK_TABLE_CF_BYTES, Constants.ID_COLUMN_BYTES)) + ", ";
+//        returnString += Bytes.toString(result.getValue(Constants.STOCK_TABLE_CF_BYTES, Constants.DATE_COLUMN_BYTES)) + ", ";
+//        returnString += Bytes.toString(result.getValue(Constants.STOCK_TABLE_CF_BYTES, Constants.SYMBOL_COLUMN_BYTES)) + ", ";
+//        returnString += Bytes.toString(result.getValue(Constants.STOCK_TABLE_CF_BYTES, Constants.PRICE_COLUMN_BYTES)) + ", ";
+//        returnString += Bytes.toString(result.getValue(Constants.STOCK_TABLE_CF_BYTES, Constants.CAP_COLUMN_BYTES));
+        System.out.println(rowName );
     }
 
 }

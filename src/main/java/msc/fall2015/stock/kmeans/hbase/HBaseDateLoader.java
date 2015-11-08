@@ -25,12 +25,14 @@ import com.google.protobuf.ServiceException;
 import msc.fall2015.stock.kmeans.hbase.utils.Constants;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hbase.*;
+import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.HColumnDescriptor;
+import org.apache.hadoop.hbase.HTableDescriptor;
+import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
-import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -42,8 +44,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class HBaseBulkDataLoader {
-    private static final Logger log = LoggerFactory.getLogger(HBaseBulkDataLoader.class);
+public class HBaseDateLoader {
+    private static final Logger log = LoggerFactory.getLogger(HBaseDateLoader.class);
 
     public static void main(String[] args) {
         try {
@@ -55,18 +57,16 @@ public class HBaseBulkDataLoader {
             Admin admin = connection.getAdmin();
 
             // Instantiating table descriptor class
-            HTableDescriptor stockTableDesc = new HTableDescriptor(TableName.valueOf(Constants.STOCK_TABLE_NAME));
+            HTableDescriptor stockDatesDesc = new HTableDescriptor(TableName.valueOf(Constants.STOCK_DATES_TABLE));
 
             // Adding column families to table descriptor
-            HColumnDescriptor stock_0414 = new HColumnDescriptor(Constants.STOCK_TABLE_CF);
-            stockTableDesc.addFamily(stock_0414);
+            HColumnDescriptor stock_Dates = new HColumnDescriptor(Constants.STOCK_DATES_CF);
+            stockDatesDesc.addFamily(stock_Dates);
 
-            // Execute the table through admin
-            if (!admin.tableExists(stockTableDesc.getTableName())){
-                admin.createTable(stockTableDesc);
-                System.out.println("Stock table created !!!");
+            if (!admin.tableExists(stockDatesDesc.getTableName())){
+                admin.createTable(stockDatesDesc);
+                System.out.println("Stock dates table created !!!");
             }
-
             // Load hbase-site.xml
             HBaseConfiguration.addHbaseResources(configuration);
             Job job = configureInsertAllJob(configuration);
@@ -87,11 +87,11 @@ public class HBaseBulkDataLoader {
     }
 
     public static Job configureInsertAllJob(Configuration configuration) throws IOException {
-        Job job = new Job(configuration, "HBase Bulk Import Example");
-        job.setJarByClass(StockInsertAllMapper.class);
+        Job job = new Job(configuration, "HBase Date Table");
+        job.setJarByClass(StockInsertDateMapper.class);
 
-        job.setMapperClass(StockInsertAllMapper.class);
-        TableMapReduceUtil.initTableReducerJob(Constants.STOCK_TABLE_NAME, StockInsertReducer.class, job);
+        job.setMapperClass(StockInsertDateMapper.class);
+        TableMapReduceUtil.initTableReducerJob(Constants.STOCK_DATES_TABLE, StockInsertDateReducer.class, job);
         //job.setReducerClass(StockInsertReducer.class);
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(Text.class);
@@ -102,20 +102,4 @@ public class HBaseBulkDataLoader {
 //        job.setNumReduceTasks(0);
         return job;
     }
-
-//    public static Job configureInsertPerYearJob(Configuration configuration) throws IOException {
-//        Job job = new Job(configuration, "HBase Bulk Import Example");
-//        job.setJarByClass(StockInsertPerYearMapper.class);
-//
-//        job.setMapperClass(StockInsertPerYearMapper.class);
-//        job.setMapOutputKeyClass(ImmutableBytesWritable.class);
-//        job.setMapOutputValueClass(KeyValue.class);
-//
-//        job.setInputFormatClass(TextInputFormat.class);
-//        FileInputFormat.addInputPath(job, new Path(Constants.HBASE_INPUT_PATH));
-//        FileOutputFormat.setOutputPath(job, new Path(Constants.HBASE_OUTPUT_PATH));
-//        TableMapReduceUtil.initTableReducerJob(Constants.STOCK_TABLE_NAME, null, job);
-//        job.setNumReduceTasks(0);
-//        return job;
-//    }
 }
