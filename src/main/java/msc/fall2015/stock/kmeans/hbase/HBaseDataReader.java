@@ -40,12 +40,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableMap;
 
 public class HBaseDataReader {
     private static final Logger log = LoggerFactory.getLogger(HBaseDataReader.class);
+    private static List<String> allDates = new ArrayList<String>();
 
     public static void main(String[] args) {
         try {
@@ -58,23 +60,26 @@ public class HBaseDataReader {
 
             HTableDescriptor[] tableDescriptor = admin.listTables();
             // printing all the table names.
-            for (int i=0; i<tableDescriptor.length;i++ ){
-                if (tableDescriptor[i].getTableName().getNameAsString().equals(Constants.STOCK_TABLE_NAME)){
-                    Table table = connection.getTable(tableDescriptor[i].getTableName());
+            for (HTableDescriptor aTableDescriptor : tableDescriptor) {
+                if (aTableDescriptor.getTableName().getNameAsString().equals(Constants.STOCK_DATES_TABLE)) {
+                    Table table = connection.getTable(aTableDescriptor.getTableName());
                     Scan scan = new Scan();
                     scan.setCaching(20);
                     scan.addFamily(Constants.STOCK_DATES_CF_BYTES);
                     ResultScanner scanner = table.getScanner(scan);
-                    printRows(scanner, table);
+                    allDates = getAllDates(scanner);
                 }
             }
-
-//        } catch (InterruptedException e) {
-//            log.error(e.getMessage(), e);
-//            e.printStackTrace();
-//        } catch (ClassNotFoundException e) {
-//            log.error(e.getMessage(), e);
-//            e.printStackTrace();
+            for (HTableDescriptor aTableDescriptor : tableDescriptor) {
+                if (aTableDescriptor.getTableName().getNameAsString().equals(Constants.STOCK_TABLE_NAME)) {
+                    Table table = connection.getTable(aTableDescriptor.getTableName());
+                    Scan scan = new Scan();
+                    scan.setCaching(20);
+                    scan.addFamily(Constants.STOCK_TABLE_CF_BYTES);
+                    ResultScanner scanner = table.getScanner(scan);
+                    printRows(scanner);
+                }
+            }
         }catch (IOException e) {
             log.error(e.getMessage(), e);
             e.printStackTrace();
@@ -84,19 +89,32 @@ public class HBaseDataReader {
         }
     }
 
-    public static void printRows(ResultScanner resultScanner, Table table) {
+    public static List<String> getAllDates(ResultScanner scanner){
+        List<String> dates = new ArrayList<String>();
+        for (Result aResultScanner : scanner) {
+            String date = new String(aResultScanner.getRow());
+            dates.add(date);
+        }
+        return dates;
+    }
+
+
+    public static void printRows(ResultScanner resultScanner) {
         for (Result aResultScanner : resultScanner) {
-            printRow(aResultScanner, table);
+            printRow(aResultScanner);
         }
     }
-    public static void printRow(Result result, Table table) {
+    public static void printRow(Result result) {
         try {
             String rowName = Bytes.toString(result.getRow());
             //if you want to get the entire row
-            byte[] value = result.getValue(Constants.STOCK_DATES_CF_BYTES, "20040202".getBytes());
-            if (value != null){
-                System.out.println("Row Name : " + rowName + " : values : " + new String(value) );
+            for (String date : allDates){
+                byte[] value = result.getValue(Constants.STOCK_TABLE_CF_BYTES, date.getBytes());
+                if (value != null){
+                    System.out.println("Row Name : " + rowName + " : values : " + new String(value) );
+                }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
