@@ -62,7 +62,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>msc.fall2015.stock.kmeans.hbase.HBaseDataReader</mainClass>
+                            <mainClass>msc.fall2015.stock.kmeans.hbase.StockDataReader</mainClass>
                         </manifest>
                         <manifestEntries>
                             <Class-Path>./resources/</Class-Path>
