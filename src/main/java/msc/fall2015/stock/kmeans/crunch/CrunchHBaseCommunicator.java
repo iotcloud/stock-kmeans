@@ -45,7 +45,7 @@ public class CrunchHBaseCommunicator extends Configured implements Tool, Seriali
         final Configuration config = getConf();
         final Pipeline pipeline = new MRPipeline(CrunchHBaseCommunicator.class,
                 "PipelineWithFilterFn", config);
-        PCollection<String> lines = pipeline.readTextFile(Constants.HBASE_INPUT_PATH);
+        PCollection<String> lines = pipeline.readTextFile(Constants.HBASE_INPUT_PATH + "/2004_2014.csv");
         PCollection<String> splitLines = splitLines(lines);
         splitLines.count().write(To.textFile(Constants.HBASE_OUTPUT_PATH + "crunch_output"));
         PipelineResult result = pipeline.done();

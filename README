@@ -1,0 +1,26 @@
+Assumptions
+ *  2004_2014.csv files is copied to HDFS and location is defined in HBASE_INPUT_PATH constant which is hdfs://156.56.179.122:9000/input
+
+Steps :
+    1. Insert data to HBase
+        1.1 Create table(Stock2004_2014Table) and column family(Stock2004_2014CF) in HBase
+            main class : HBaseBulkDataLoader
+            mapper class : StockInsertAllMapper
+            reducer class : StockInsertReducer
+            data structure : row key : id_symbol, row val : date_price_cap
+
+        1.2 Create table (StockDatesTable), CF - StockDatesCF to store dates
+            main class : HBaseDateLoader
+            mapper class : StockInsertDateMapper
+            reducer class : StockInsertDateReducer
+            data structure : row key : date, row val : date
+
+    2. Read Data from HBase
+        Read Stock2004_2014Table content during a period and find regression (intercept, slope and error)
+         main class : StockDataReader
+         mapper class : HBaseDataReaderMapper
+
+
+
+
+
