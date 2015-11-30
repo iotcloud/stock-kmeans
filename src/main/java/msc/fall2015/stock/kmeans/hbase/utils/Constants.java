@@ -22,10 +22,13 @@
 package msc.fall2015.stock.kmeans.hbase.utils;
 
 public class Constants {
-    public static final String STOCK_TABLE_NAME = "Stock2004_2014Table";
-    public static final String STOCK_TABLE_CF = "Stock2004_2014CF";
-    public static final String STOCK_DATES_TABLE = "StockDatesTable";
-    public static final String STOCK_DATES_CF = "StockDatesCF";
+    public static final String STOCK_TABLE_NAME = "Stock2004_2014Table1";
+    public static final String STOCK_TABLE_CF = "Stock2004_2014CF1";
+    public static final String STOCK_DATES_TABLE = "StockDatesTable1";
+    public static final String STOCK_DATES_CF = "StockDatesCF1";
+    public static final String REGRESSION_TABLE_NAME = "RegressionTable";
+    public static final String REGRESSION_TABLE_CF = "RegressionTableCF";
+    public static final String REGRESSION_TABLE_QUALIFIER = "RegressionTableQualifier";
     public static final String ID_COLUMN = "id";
     public static final String DATE_COLUMN = "date";
     public static final String SYMBOL_COLUMN = "symbol";
