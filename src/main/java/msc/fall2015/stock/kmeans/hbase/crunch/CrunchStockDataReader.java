@@ -19,12 +19,10 @@
  *
 */
 
-package msc.fall2015.stock.kmeans.crunch;
+package msc.fall2015.stock.kmeans.hbase.crunch;
 
 import com.google.protobuf.ServiceException;
-import msc.fall2015.stock.kmeans.crunch.utils.CrunchUtils;
-import msc.fall2015.stock.kmeans.hbase.HBaseDataReaderMapper;
-import msc.fall2015.stock.kmeans.hbase.utils.Constants;
+import msc.fall2015.stock.kmeans.utils.Constants;
 import org.apache.commons.math.stat.regression.SimpleRegression;
 import org.apache.crunch.*;
 import org.apache.crunch.fn.Aggregators;
@@ -38,10 +36,7 @@ import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
-import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.lib.output.NullOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.slf4j.Logger;
@@ -54,13 +49,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class CrunchHBaseDataReader extends Configured implements Tool, Serializable {
-    private static final Logger log = LoggerFactory.getLogger(CrunchHBaseDataReader.class);
+public class CrunchStockDataReader extends Configured implements Tool, Serializable {
+    private static final Logger log = LoggerFactory.getLogger(CrunchStockDataReader.class);
     private static String startDate;
     private static String endDate;
 
     public static void main(final String[] args) throws Exception {
-        final int res = ToolRunner.run(new Configuration(), new CrunchHBaseDataReader(), args);
+        final int res = ToolRunner.run(new Configuration(), new CrunchStockDataReader(), args);
         System.exit(res);
     }
 
@@ -79,7 +74,7 @@ public class CrunchHBaseDataReader extends Configured implements Tool, Serializa
                 endDate = "20141231";
             }
             Configuration config = HBaseConfiguration.create();
-            Pipeline pipeline = new MRPipeline(CrunchHBaseDataReader.class, config);
+            Pipeline pipeline = new MRPipeline(CrunchStockDataReader.class, config);
 
             Scan scan = new Scan();
             scan.setCaching(500);        // 1 is the default in Scan, which will be bad for MapReduce jobs
@@ -200,8 +195,8 @@ public class CrunchHBaseDataReader extends Configured implements Tool, Serializa
 
     public static List<String> getDates() throws ParseException {
         List<String> allDates = new ArrayList<String>();
-        Date startDate = getDate(CrunchHBaseDataReader.startDate);
-        Date endDate = getDate(CrunchHBaseDataReader.endDate);
+        Date startDate = getDate(CrunchStockDataReader.startDate);
+        Date endDate = getDate(CrunchStockDataReader.endDate);
         ResultScanner scannerForDateTable = getScannerForDateTable();
         for (Result aResultScanner : scannerForDateTable) {
             String date = new String(aResultScanner.getRow());

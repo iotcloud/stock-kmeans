@@ -19,7 +19,7 @@
  *
 */
 
-package msc.fall2015.stock.kmeans.hbase.utils;
+package msc.fall2015.stock.kmeans.utils;
 
 public class Constants {
     public static final String STOCK_TABLE_NAME = "Stock2004_2014Table1";

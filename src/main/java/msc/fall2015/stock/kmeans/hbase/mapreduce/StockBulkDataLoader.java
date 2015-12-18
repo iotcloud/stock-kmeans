@@ -19,10 +19,10 @@
  *
 */
 
-package msc.fall2015.stock.kmeans.hbase;
+package msc.fall2015.stock.kmeans.hbase.mapreduce;
 
 import com.google.protobuf.ServiceException;
-import msc.fall2015.stock.kmeans.hbase.utils.Constants;
+import msc.fall2015.stock.kmeans.utils.Constants;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.*;
@@ -30,7 +30,6 @@ import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
-import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -42,8 +41,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class HBaseBulkDataLoader {
-    private static final Logger log = LoggerFactory.getLogger(HBaseBulkDataLoader.class);
+/**
+ * This is the main class to create table Stock2004_2014Table and column family Stock2004_2014CF in HBase
+ * mapper class : StockInsertAllMapper
+ * reducer class : StockInsertReducer
+ * data structure : row key : id_symbol, row val : date_price_cap
+ */
+public class StockBulkDataLoader {
+    private static final Logger log = LoggerFactory.getLogger(StockBulkDataLoader.class);
 
     public static void main(String[] args) {
         try {
@@ -92,14 +97,12 @@ public class HBaseBulkDataLoader {
 
         job.setMapperClass(StockInsertAllMapper.class);
         TableMapReduceUtil.initTableReducerJob(Constants.STOCK_TABLE_NAME, StockInsertReducer.class, job);
-        //job.setReducerClass(StockInsertReducer.class);
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(Text.class);
 
         job.setInputFormatClass(TextInputFormat.class);
         FileInputFormat.addInputPath(job, new Path(Constants.HBASE_INPUT_PATH));
         FileOutputFormat.setOutputPath(job, new Path(Constants.HBASE_OUTPUT_PATH));
-//        job.setNumReduceTasks(0);
         return job;
     }
 

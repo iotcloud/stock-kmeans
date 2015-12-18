@@ -6,13 +6,13 @@ Map Reduce
 Steps :
     1. Insert data to HBase
         1.1 Create table(Stock2004_2014Table) and column family(Stock2004_2014CF) in HBase
-            main class : HBaseBulkDataLoader
+            main class : StockBulkDataLoader
             mapper class : StockInsertAllMapper
             reducer class : StockInsertReducer
             data structure : row key : id_symbol, row val : date_price_cap
 
         1.2 Create table (StockDatesTable), CF - StockDatesCF to store dates
-            main class : HBaseDateLoader
+            main class : StockDateLoader
             mapper class : StockInsertDateMapper
             reducer class : StockInsertDateReducer
             data structure : row key : date, row val : date
@@ -20,7 +20,7 @@ Steps :
     2. Read Data from HBase
         Read Stock2004_2014Table content during a period and find regression (intercept, slope and error)
          main class : StockDataReader
-         mapper class : HBaseDataReaderMapper
+         mapper class : StockDataReaderMapper
 
 
 Crunch
@@ -29,19 +29,19 @@ Crunch
 Steps :
     1. Insert data to HBase
         1.1 Create table(Stock2004_2014Table) and column family(Stock2004_2014CF) in HBase
-            main class : CrunchHBaseAllDataInserter
+            main class : CrunchStockAllDataInserter
             data structure : row key : id_symbol, row val : date_price_cap
-            command : ./bin/hadoop jar ~/chathuri/hadoop/hadoop-2.7.1/stock-kmeans-1.0.0-jar-with-dependencies.jar msc.fall2015.stock.kmeans.crunch.CrunchHBaseAllDataInserter
+            command : ./bin/hadoop jar ~/chathuri/hadoop/hadoop-2.7.1/stock-kmeans-1.0.0-jar-with-dependencies.jar msc.fall2015.stock.kmeans.hbase.crunch.CrunchHBaseAllDataInserter
 
         1.2 Create table (StockDatesTable), CF - StockDatesCF to store dates
-            main class : CrunchHBaseDateInserter
+            main class : CrunchStockDateInserter
             data structure : row key : date, row val : date
-            command : ./bin/hadoop jar ~/chathuri/hadoop/hadoop-2.7.1/stock-kmeans-1.0.0-jar-with-dependencies.jar msc.fall2015.stock.kmeans.crunch.CrunchHBaseDateInserter
+            command : ./bin/hadoop jar ~/chathuri/hadoop/hadoop-2.7.1/stock-kmeans-1.0.0-jar-with-dependencies.jar msc.fall2015.stock.kmeans.hbase.crunch.CrunchHBaseDateInserter
 
     2. Read Data from HBase
         Read Stock2004_2014Table content during a period and find regression (intercept, slope and error)
-         main class : CrunchHBaseDataReader
-         command : ./bin/hadoop jar ~/chathuri/hadoop/hadoop-2.7.1/stock-kmeans-1.0.0-jar-with-dependencies.jar msc.fall2015.stock.kmeans.crunch.CrunchHBaseDataReader 20110719 20110919
+         main class : CrunchStockDataReader
+         command : ./bin/hadoop jar ~/chathuri/hadoop/hadoop-2.7.1/stock-kmeans-1.0.0-jar-with-dependencies.jar msc.fall2015.stock.kmeans.hbase.crunch.CrunchHBaseDataReader 20110719 20110919
 
 
 

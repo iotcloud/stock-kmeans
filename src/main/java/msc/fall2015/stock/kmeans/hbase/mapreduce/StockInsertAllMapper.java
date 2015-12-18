@@ -19,7 +19,7 @@
  *
 */
 
-package msc.fall2015.stock.kmeans.hbase;
+package msc.fall2015.stock.kmeans.hbase.mapreduce;
 
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -30,10 +30,10 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 
-public class StockInsertDateMapper extends
+public class StockInsertAllMapper extends
         Mapper<LongWritable, Text, Text, Text   > {
 
-    private static final Logger log = LoggerFactory.getLogger(HBaseBulkDataLoader.class);
+    private static final Logger log = LoggerFactory.getLogger(StockBulkDataLoader.class);
 
     @Override
     protected void setup(Context context) throws IOException, InterruptedException {
@@ -46,7 +46,7 @@ public class StockInsertDateMapper extends
             throws IOException, InterruptedException {
 
         String[] fields = null;
-        String date= null,rowKey = null, rowVal = null;
+        String id = null, symbol= null, date= null, cap= null, price = null, rowKey = null, rowVal = null;
         try {
             fields = value.toString().split(",");
         } catch (Exception ex) {
@@ -54,13 +54,28 @@ public class StockInsertDateMapper extends
             return;
         }
 
+        if (fields.length > 0 && fields[0] != null && !fields[0].equals("")) {
+            id = fields[0];
+        }
+
         if (fields.length > 1 && fields[1] != null && !fields[1].equals("")) {
             date = fields[1];
         }
 
-        if (date != null){
-            rowKey = date;
-            rowVal = date;
+        if (fields.length > 2 && fields[2] != null && !fields[2].equals("")) {
+            symbol = fields[2];
+        }
+
+        if (fields.length > 3 && fields[3] != null && !fields[3].equals("")) {
+            price = fields[3];
+        }
+
+        if (fields.length > 4 && fields[4] != null && !fields[4].equals("")) {
+            cap = fields[4];
+        }
+        if (id != null && symbol != null){
+            rowKey = id + "_" + symbol;
+            rowVal = date + "_" + price + "_" + cap;
             context.write(new Text(rowKey), new Text(rowVal));
         }
 

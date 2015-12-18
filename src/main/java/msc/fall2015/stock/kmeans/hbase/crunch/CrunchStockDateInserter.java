@@ -19,11 +19,11 @@
  *
 */
 
-package msc.fall2015.stock.kmeans.crunch;
+package msc.fall2015.stock.kmeans.hbase.crunch;
 
 import com.google.protobuf.ServiceException;
-import msc.fall2015.stock.kmeans.crunch.utils.CrunchUtils;
-import msc.fall2015.stock.kmeans.hbase.utils.Constants;
+import msc.fall2015.stock.kmeans.hbase.crunch.utils.CrunchUtils;
+import msc.fall2015.stock.kmeans.utils.Constants;
 import org.apache.crunch.PCollection;
 import org.apache.crunch.Pipeline;
 import org.apache.crunch.PipelineResult;
@@ -43,10 +43,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 
-public class CrunchHBaseAllDataInserter extends Configured implements Tool, Serializable {
-    private static final Logger log = LoggerFactory.getLogger(CrunchHBaseAllDataInserter.class);
+public class CrunchStockDateInserter extends Configured implements Tool, Serializable {
+    private static final Logger log = LoggerFactory.getLogger(CrunchStockDateInserter.class);
     public static void main(final String[] args) throws Exception {
-        final int res = ToolRunner.run(new Configuration(), new CrunchHBaseAllDataInserter(), args);
+        final int res = ToolRunner.run(new Configuration(), new CrunchStockDateInserter(), args);
         System.exit(res);
     }
 
@@ -54,13 +54,13 @@ public class CrunchHBaseAllDataInserter extends Configured implements Tool, Seri
     public int run(final String[] args) throws Exception {
         createTable();
         final Configuration config = getConf();
-        final Pipeline pipeline = new MRPipeline(CrunchHBaseAllDataInserter.class,
+        final Pipeline pipeline = new MRPipeline(CrunchStockDateInserter.class,
                 "PipelineWithFilterFn", config);
         PCollection<String> lines = pipeline.readTextFile(Constants.HBASE_INPUT_PATH + "/2004_2014.csv");
-        PCollection<Put> resultPut = CrunchUtils.returnRows(lines);
+        PCollection<Put> resultPut = CrunchUtils.returnDates(lines);
         System.out.println("********** size ************ : " + resultPut.getSize() );
 
-        pipeline.write(resultPut, new HBaseTarget(Constants.STOCK_TABLE_NAME));
+        pipeline.write(resultPut, new HBaseTarget(Constants.STOCK_DATES_TABLE));
         PipelineResult result = pipeline.done();
         return result.succeeded() ? 0 : 1;
     }
@@ -75,10 +75,10 @@ public class CrunchHBaseAllDataInserter extends Configured implements Tool, Seri
             Admin admin = connection.getAdmin();
 
             // Instantiating table descriptor class
-            HTableDescriptor stockTableDesc = new HTableDescriptor(TableName.valueOf(Constants.STOCK_TABLE_NAME));
+            HTableDescriptor stockTableDesc = new HTableDescriptor(TableName.valueOf(Constants.STOCK_DATES_TABLE));
 
             // Adding column families to table descriptor
-            HColumnDescriptor stock_0414 = new HColumnDescriptor(Constants.STOCK_TABLE_CF);
+            HColumnDescriptor stock_0414 = new HColumnDescriptor(Constants.STOCK_DATES_CF);
             stockTableDesc.addFamily(stock_0414);
 
             // Execute the table through admin

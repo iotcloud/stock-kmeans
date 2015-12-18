@@ -19,7 +19,7 @@
  *
 */
 
-package msc.fall2015.stock.kmeans.hbase;
+package msc.fall2015.stock.kmeans.hbase.mapreduce;
 
 import org.apache.commons.math.stat.regression.SimpleRegression;
 import org.apache.hadoop.hbase.client.Result;
@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.NavigableMap;
 
-public class HBaseDataReaderMapper extends TableMapper<Text, Text> {
+public class StockDataReaderMapper extends TableMapper<Text, Text> {
 
     public void map(ImmutableBytesWritable row, Result value, Context context) throws InterruptedException, IOException {
         SimpleRegression regression;

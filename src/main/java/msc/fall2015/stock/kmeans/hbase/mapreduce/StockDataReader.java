@@ -19,10 +19,10 @@
  *
 */
 
-package msc.fall2015.stock.kmeans.hbase;
+package msc.fall2015.stock.kmeans.hbase.mapreduce;
 
 import com.google.protobuf.ServiceException;
-import msc.fall2015.stock.kmeans.hbase.utils.Constants;
+import msc.fall2015.stock.kmeans.utils.Constants;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HTableDescriptor;
@@ -43,6 +43,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * This class reads data of a given data range and find the regression (intercept, slope and error)
+ * mapper class : HBaseDataReaderMapper
+ */
 public class StockDataReader {
     private static String startDate;
     private static String endDate;
@@ -63,7 +67,7 @@ public class StockDataReader {
             }
             Configuration config = HBaseConfiguration.create();
             Job job = new Job(config, "ExampleRead");
-            job.setJarByClass(HBaseDataReaderMapper.class);     // class that contains mapper
+            job.setJarByClass(StockDataReaderMapper.class);     // class that contains mapper
 
             Scan scan = new Scan();
             scan.setCaching(500);        // 1 is the default in Scan, which will be bad for MapReduce jobs
@@ -78,7 +82,7 @@ public class StockDataReader {
             TableMapReduceUtil.initTableMapperJob(
                     Constants.STOCK_TABLE_NAME,        // input HBase table name
                     scan,             // Scan instance to control CF and attribute selection
-                    HBaseDataReaderMapper.class,   // mapper
+                    StockDataReaderMapper.class,   // mapper
                     null,             // mapper output key
                     null,             // mapper output value
                     job);

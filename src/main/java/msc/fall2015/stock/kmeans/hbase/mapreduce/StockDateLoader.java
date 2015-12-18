@@ -19,10 +19,10 @@
  *
 */
 
-package msc.fall2015.stock.kmeans.hbase;
+package msc.fall2015.stock.kmeans.hbase.mapreduce;
 
 import com.google.protobuf.ServiceException;
-import msc.fall2015.stock.kmeans.hbase.utils.Constants;
+import msc.fall2015.stock.kmeans.utils.Constants;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.HBaseConfiguration;
@@ -44,8 +44,15 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class HBaseDateLoader {
-    private static final Logger log = LoggerFactory.getLogger(HBaseDateLoader.class);
+/**
+ * This is the main class to create table which insert all the available dates for the data set. This class creates
+ * StockDatesTable and StockDatesCF in Hbase.
+ * mapper class : StockInsertDateMapper
+ * reducer class : StockInsertDateReducer
+ * data structure : row key : date, row val : date
+ */
+public class StockDateLoader {
+    private static final Logger log = LoggerFactory.getLogger(StockDateLoader.class);
 
     public static void main(String[] args) {
         try {

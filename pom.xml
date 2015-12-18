@@ -72,7 +72,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>msc.fall2015.stock.kmeans.crunch.CrunchHBaseDataReader</mainClass>
+                            <mainClass>msc.fall2015.stock.kmeans.hbase.crunch.CrunchStockDataReader</mainClass>
                         </manifest>
                         <manifestEntries>
                             <Class-Path>./resources/</Class-Path>
