@@ -16,12 +16,21 @@ public class VectorPoint {
 
     double factor = 1.0;
 
+    String symbol;
+
     static double maxChange = Double.MIN_VALUE;
     static double minChange = Double.MAX_VALUE;
 
     boolean constantVector = false;
 
     public static final double CONST_DISTANCE = .5;
+
+    public VectorPoint(int key, String symbol, double[] numbers, double totalCap) {
+        this.key = key;
+        this.symbol = symbol;
+        this.numbers = numbers;
+        this.totalCap = totalCap;
+    }
 
     public VectorPoint(int key, int size) {
         this(key, size, false);
@@ -108,6 +117,10 @@ public class VectorPoint {
 
     public int getElements() {
         return elements;
+    }
+
+    public void setElements(int elements) {
+        this.elements = elements;
     }
 
     public VectorPoint(int key, double[] numbers) {
@@ -471,8 +484,7 @@ public class VectorPoint {
 
     public String serialize() {
         double marketCap = this.totalCap / this.elements;
-        StringBuilder sb = new StringBuilder(Integer.toString(key)).append(" ").append(Double.toString(marketCap)).append(" ");
-        int missingCount = 0;
+        StringBuilder sb = new StringBuilder().append(symbol).append(',').append(Double.toString(marketCap)).append("");
         for (int i = 0; i < elements; i++) {
             sb.append(Double.toString(numbers[i])).append(" ");
         }

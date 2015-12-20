@@ -101,8 +101,8 @@ public class StockBulkDataLoader {
         job.setMapOutputValueClass(Text.class);
 
         job.setInputFormatClass(TextInputFormat.class);
-        FileInputFormat.addInputPath(job, new Path(Constants.HBASE_INPUT_PATH));
-        FileOutputFormat.setOutputPath(job, new Path(Constants.HBASE_OUTPUT_PATH));
+        FileInputFormat.addInputPath(job, new Path(Constants.HDFS_INPUT_PATH));
+        FileOutputFormat.setOutputPath(job, new Path(Constants.HDFS_OUTPUT_PATH));
         return job;
     }
 
@@ -115,8 +115,8 @@ public class StockBulkDataLoader {
 //        job.setMapOutputValueClass(KeyValue.class);
 //
 //        job.setInputFormatClass(TextInputFormat.class);
-//        FileInputFormat.addInputPath(job, new Path(Constants.HBASE_INPUT_PATH));
-//        FileOutputFormat.setOutputPath(job, new Path(Constants.HBASE_OUTPUT_PATH));
+//        FileInputFormat.addInputPath(job, new Path(Constants.HDFS_INPUT_PATH));
+//        FileOutputFormat.setOutputPath(job, new Path(Constants.HDFS_OUTPUT_PATH));
 //        TableMapReduceUtil.initTableReducerJob(Constants.STOCK_TABLE_NAME, null, job);
 //        job.setNumReduceTasks(0);
 //        return job;

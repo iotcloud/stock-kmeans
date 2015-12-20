@@ -56,7 +56,7 @@ public class CrunchStockAllDataInserter extends Configured implements Tool, Seri
         final Configuration config = getConf();
         final Pipeline pipeline = new MRPipeline(CrunchStockAllDataInserter.class,
                 "PipelineWithFilterFn", config);
-        PCollection<String> lines = pipeline.readTextFile(Constants.HBASE_INPUT_PATH + "/2004_2014.csv");
+        PCollection<String> lines = pipeline.readTextFile(Constants.HDFS_INPUT_PATH + "/2004_2014.csv");
         PCollection<Put> resultPut = CrunchUtils.returnRows(lines);
         System.out.println("********** size ************ : " + resultPut.getSize() );
 

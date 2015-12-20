@@ -56,7 +56,7 @@ public class CrunchStockDateInserter extends Configured implements Tool, Seriali
         final Configuration config = getConf();
         final Pipeline pipeline = new MRPipeline(CrunchStockDateInserter.class,
                 "PipelineWithFilterFn", config);
-        PCollection<String> lines = pipeline.readTextFile(Constants.HBASE_INPUT_PATH + "/2004_2014.csv");
+        PCollection<String> lines = pipeline.readTextFile(Constants.HDFS_INPUT_PATH + "/2004_2014.csv");
         PCollection<Put> resultPut = CrunchUtils.returnDates(lines);
         System.out.println("********** size ************ : " + resultPut.getSize() );
 

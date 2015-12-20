@@ -72,7 +72,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>msc.fall2015.stock.kmeans.hbase.crunch.CrunchStockDataReader</mainClass>
+                            <mainClass>msc.fall2015.stock.kmeans.hbase.mapreduce.StockVectorCalculator</mainClass>
                         </manifest>
                         <manifestEntries>
                             <Class-Path>./resources/</Class-Path>

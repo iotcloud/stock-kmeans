@@ -22,13 +22,16 @@
 package msc.fall2015.stock.kmeans.hbase.mapreduce;
 
 import msc.fall2015.stock.kmeans.hbase.utils.TableUtils;
+import msc.fall2015.stock.kmeans.hbase.utils.VectorPoint;
 import msc.fall2015.stock.kmeans.utils.Constants;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.lib.output.NullOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,16 +39,12 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 
-/**
- * This class reads data of a given data range and find the regression (intercept, slope and error)
- * mapper class : HBaseDataReaderMapper
- */
-public class StockDataReader {
+public class StockVectorCalculator {
     private static String startDate;
     private static String endDate;
     private static final Logger log = LoggerFactory.getLogger(StockDataReader.class);
 
-    public static void main(String[] args) throws InterruptedException, IOException, ClassNotFoundException {
+    public static void main(String[] args) {
         try {
             startDate = args[1];
             endDate = args[2];
@@ -59,7 +58,7 @@ public class StockDataReader {
                 endDate = "20141231";
             }
             Configuration config = HBaseConfiguration.create();
-            Job job = new Job(config, "ExampleRead");
+            Job job = new Job(config,"ExampleSummaryToFile");
             job.setJarByClass(StockDataReaderMapper.class);     // class that contains mapper
 
             Scan scan = new Scan();
@@ -75,12 +74,11 @@ public class StockDataReader {
             TableMapReduceUtil.initTableMapperJob(
                     Constants.STOCK_TABLE_NAME,        // input HBase table name
                     scan,             // Scan instance to control CF and attribute selection
-                    StockDataReaderMapper.class,   // mapper
-                    null,             // mapper output key
-                    null,             // mapper output value
+                    StockDistanceCalculatorMapper.class,   // mapper
+                    Text.class,             // mapper output key
+                    VectorPoint.class,             // mapper output value
                     job);
-            job.setOutputFormatClass(NullOutputFormat.class);   // because we aren't emitting anything from mapper
-
+            FileOutputFormat.setOutputPath(job, new Path(Constants.HDFS_OUTPUT_PATH + "vector_" + startDate + "_" + endDate));  // adjust directories as required
             boolean b = job.waitForCompletion(true);
             if (!b) {
                 throw new IOException("error with job!");
@@ -88,6 +86,12 @@ public class StockDataReader {
         } catch (ParseException e) {
             log.error("Error while parsing date", e);
             throw new RuntimeException("Error while parsing date", e);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
