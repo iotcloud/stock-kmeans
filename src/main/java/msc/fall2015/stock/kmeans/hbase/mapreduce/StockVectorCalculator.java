@@ -22,7 +22,6 @@
 package msc.fall2015.stock.kmeans.hbase.mapreduce;
 
 import msc.fall2015.stock.kmeans.hbase.utils.TableUtils;
-import msc.fall2015.stock.kmeans.hbase.utils.VectorPoint;
 import msc.fall2015.stock.kmeans.utils.Constants;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -33,23 +32,26 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.mapreduce.lib.output.NullOutputFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
+import java.util.TreeMap;
 
 public class StockVectorCalculator {
     private static String startDate;
     private static String endDate;
+    private static int mode;
     private static final Logger log = LoggerFactory.getLogger(StockDataReader.class);
 
     public static void main(String[] args) {
         try {
             startDate = args[1];
             endDate = args[2];
+            mode = Integer.valueOf(args[3]);
             System.out.println("Start Date : " + startDate);
             System.out.println("End Date : " + endDate);
             if (startDate == null || startDate.isEmpty()) {
@@ -59,33 +61,35 @@ public class StockVectorCalculator {
             if (endDate == null || endDate.isEmpty()) {
                 endDate = "20141231";
             }
+            if (mode == 0){
+                mode = 1;
+            }
             Configuration config = HBaseConfiguration.create();
-            Job job = new Job(config,"ExampleSummaryToFile");
-            job.setJarByClass(StockDataReaderMapper.class);     // class that contains mapper
+            TreeMap<String, List<Date>> genDates = TableUtils.genDates(TableUtils.getDate(startDate), TableUtils.getDate(endDate), mode);
+            for (String id : genDates.keySet()){
+                Job job = new Job(config,"ExampleSummaryToFile");
+                job.setJarByClass(StockDataReaderMapper.class);     // class that contains mapper
 
-            Scan scan = new Scan();
-            scan.setCaching(500);        // 1 is the default in Scan, which will be bad for MapReduce jobs
-            scan.setCacheBlocks(false);  // don't set to true for MR jobs
-            List<String> suitableDates = TableUtils.getDates(startDate, endDate);
-            if (suitableDates != null && !suitableDates.isEmpty()){
-                System.out.println("******* Date Count : " + suitableDates.size());
-                for (String date : suitableDates){
-                    scan.addColumn(Constants.STOCK_TABLE_CF_BYTES, date.getBytes());
+                Scan scan = new Scan();
+                scan.setCaching(500);        // 1 is the default in Scan, which will be bad for MapReduce jobs
+                scan.setCacheBlocks(false);  // don't set to true for MR jobs
+                for (Date date : genDates.get(id)){
+                    scan.addColumn(Constants.STOCK_TABLE_CF_BYTES, TableUtils.convertDateToString(date).getBytes());
+                }
+                TableMapReduceUtil.initTableMapperJob(
+                        Constants.STOCK_TABLE_NAME,        // input HBase table name
+                        scan,             // Scan instance to control CF and attribute selection
+                        StockVectorCalculatorMapper.class,   // mapper
+                        IntWritable.class,             // mapper output key
+                        Text.class,             // mapper output value
+                        job);
+                FileOutputFormat.setOutputPath(job, new Path(Constants.HDFS_OUTPUT_PATH + id));  // adjust directories as required
+                boolean b = job.waitForCompletion(true);
+                if (!b) {
+                    throw new IOException("error with job!");
                 }
             }
-            TableMapReduceUtil.initTableMapperJob(
-                    Constants.STOCK_TABLE_NAME,        // input HBase table name
-                    scan,             // Scan instance to control CF and attribute selection
-                    StockVectorCalculatorMapper.class,   // mapper
-                    IntWritable.class,             // mapper output key
-                    Text.class,             // mapper output value
-                    job);
-//            job.setOutputFormatClass(NullOutputFormat.class);
-            FileOutputFormat.setOutputPath(job, new Path(Constants.HDFS_OUTPUT_PATH + "vector_" + startDate + "_" + endDate));  // adjust directories as required
-            boolean b = job.waitForCompletion(true);
-            if (!b) {
-                throw new IOException("error with job!");
-            }
+
         } catch (ParseException e) {
             log.error("Error while parsing date", e);
             throw new RuntimeException("Error while parsing date", e);

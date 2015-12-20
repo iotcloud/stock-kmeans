@@ -84,13 +84,15 @@ public class StockVectorCalculatorMapper extends TableMapper<IntWritable, Text> 
                 priceArr[i] = priceList.get(i);
             }
             VectorPoint vectorPoint = new VectorPoint(id,symbol, priceArr,totalCap);
-            vectorPoint.setElements(count);
+            vectorPoint.setElements(priceList.size());
             String serialize = null;
             if(vectorPoint.cleanVector(new CleanMetric())){
                 serialize = vectorPoint.serialize();
                 System.out.println(serialize);
             }
-            context.write(new IntWritable(id), new Text(serialize));
+            if (serialize != null){
+                context.write(new IntWritable(id), new Text(serialize));
+            }
         }
     }
 }
