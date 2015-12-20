@@ -484,10 +484,11 @@ public class VectorPoint {
 
     public String serialize() {
         double marketCap = this.totalCap / this.elements;
-        StringBuilder sb = new StringBuilder().append(symbol).append(',').append(Double.toString(marketCap)).append("");
-        for (int i = 0; i < elements; i++) {
-            sb.append(Double.toString(numbers[i])).append(" ");
+        StringBuilder sb = new StringBuilder().append(symbol).append(',').append(Double.toString(marketCap)).append(",");
+        for (int i = 0; i < elements-1; i++) {
+            sb.append(Double.toString(numbers[i])).append(",");
         }
+        sb.append(Double.toString(numbers.length-1));
         return sb.toString();
     }
 
