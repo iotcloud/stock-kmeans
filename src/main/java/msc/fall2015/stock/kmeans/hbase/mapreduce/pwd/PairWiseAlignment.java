@@ -67,6 +67,7 @@ import java.net.URISyntaxException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.filecache.DistributedCache;
+import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
@@ -93,17 +94,20 @@ public class PairWiseAlignment extends Configured implements Tool {
 	}
 
 	public int run(String[] args) throws Exception {
-		if (args.length < 3) {
+		if (args.length < 2) {
 			System.err
 					.println("Usage:  <sequence_file> <sequence_count> <block_size> [hdfs_dir]");
 			System.exit(2);
 		}
 
 		/* input parameters */
-		String sequenceFile = args[0];
-		// we are limited to int's as java loops supports only them
-		int noOfSequences = Integer.parseInt(args[1]);
-		int blockSize = Integer.parseInt(args[2]);
+		String sequenceFile = args[1];
+        System.out.println(sequenceFile);
+        // we are limited to int's as java loops supports only them
+		int noOfSequences = Integer.parseInt(args[2]);
+//		int noOfSequences = 7322;
+		int blockSize = Integer.parseInt(args[3]);
+//		int blockSize = 7322;
 
 		Configuration conf = new Configuration();
 		Job job = new Job(conf, "Pairwise-analysis");
@@ -231,9 +235,8 @@ public class PairWiseAlignment extends Configured implements Tool {
 			IOException, URISyntaxException {
 		// Break the sequences file in to parts based on the block size. Stores
 		// the parts in HDFS and add them to the Hadoop distributed cache.
-		FileInputStream inStream = new FileInputStream(sequenceFile);
-		BufferedReader bufferedReader = new BufferedReader(
-				new InputStreamReader(inStream));
+        Path path = new Path(sequenceFile);
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fs.open(path)));
 
 		for (int partNo = 0; partNo < noOfDivisions; partNo++) {
 			//
@@ -246,7 +249,9 @@ public class PairWiseAlignment extends Configured implements Tool {
 			for (int sequenceIndex = 0; ((sequenceIndex < blockSize) & (sequenceIndex
 					+ (partNo * blockSize) < noOfSequences)); sequenceIndex++) {
 				String line;
-				if ((line = bufferedReader.readLine()) == null) {
+                line = bufferedReader.readLine();
+                System.out.println(line);
+                if (line == null) {
 					throw new IOException(
 							"Cannot read the sequence from input file.");
 				}

@@ -68,7 +68,7 @@ import java.util.List;
 
 public class SequenceParser {
 	public static VectorPoint parseVectorLine(String line) {
-		String parts[] = line.trim().split(" ");
+		String parts[] = line.trim().split(",");
 		if (parts.length > 0 && !(parts.length == 1 && parts[0].equals(""))) {
 			int key = Integer.parseInt(parts[0]);
 			double cap = Double.parseDouble(parts[1]);

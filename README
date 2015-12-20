@@ -9,7 +9,7 @@ Steps :
             main class : StockBulkDataLoader
             mapper class : StockInsertAllMapper
             reducer class : StockInsertReducer
-            data structure : row key : id_symbol, row val : date_price_cap
+            data structure : row key : id_symbol, row val : col family key : date col family val : price_cap
 
         1.2 Create table (StockDatesTable), CF - StockDatesCF to store dates
             main class : StockDateLoader
@@ -21,6 +21,8 @@ Steps :
         Read Stock2004_2014Table content during a period and find regression (intercept, slope and error)
          main class : StockDataReader
          mapper class : StockDataReaderMapper
+
+    3. Read data from HBase for given range and with mode and write vector files to HDFS
 
 
 Crunch

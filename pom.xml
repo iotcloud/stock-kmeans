@@ -72,7 +72,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>msc.fall2015.stock.kmeans.hbase.mapreduce.StockVectorCalculator</mainClass>
+                            <mainClass>msc.fall2015.stock.kmeans.hbase.mapreduce.pwd.PairWiseAlignment</mainClass>
                         </manifest>
                         <manifestEntries>
                             <Class-Path>./resources/</Class-Path>
