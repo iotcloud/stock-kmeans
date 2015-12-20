@@ -31,7 +31,6 @@ public class TableUtils {
             String date = new String(aResultScanner.getRow());
             Date rowDate = getDate(date);
             if (startDate.compareTo(rowDate) * rowDate.compareTo(endDate) > 0){
-                System.out.println("***** DATE ******** : " + date);
                 allDates.add(date);
             }
         }

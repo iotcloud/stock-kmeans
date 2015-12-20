@@ -29,9 +29,11 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.NullOutputFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,10 +76,11 @@ public class StockVectorCalculator {
             TableMapReduceUtil.initTableMapperJob(
                     Constants.STOCK_TABLE_NAME,        // input HBase table name
                     scan,             // Scan instance to control CF and attribute selection
-                    StockDistanceCalculatorMapper.class,   // mapper
-                    Text.class,             // mapper output key
-                    VectorPoint.class,             // mapper output value
+                    StockVectorCalculatorMapper.class,   // mapper
+                    IntWritable.class,             // mapper output key
+                    Text.class,             // mapper output value
                     job);
+//            job.setOutputFormatClass(NullOutputFormat.class);
             FileOutputFormat.setOutputPath(job, new Path(Constants.HDFS_OUTPUT_PATH + "vector_" + startDate + "_" + endDate));  // adjust directories as required
             boolean b = job.waitForCompletion(true);
             if (!b) {

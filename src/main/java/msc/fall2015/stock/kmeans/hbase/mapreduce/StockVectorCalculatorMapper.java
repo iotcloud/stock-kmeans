@@ -8,6 +8,7 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.mapreduce.TableMapper;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 
 import java.io.IOException;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 
-public class StockVectorCalculatorMapper extends TableMapper<Text, VectorPoint> {
+public class StockVectorCalculatorMapper extends TableMapper<IntWritable, Text> {
     /**
      * The start date we are interested in
      */
@@ -84,11 +85,12 @@ public class StockVectorCalculatorMapper extends TableMapper<Text, VectorPoint> 
             }
             VectorPoint vectorPoint = new VectorPoint(id,symbol, priceArr,totalCap);
             vectorPoint.setElements(count);
+            String serialize = null;
             if(vectorPoint.cleanVector(new CleanMetric())){
-                String serialize = vectorPoint.serialize();
+                serialize = vectorPoint.serialize();
                 System.out.println(serialize);
             }
-            context.write(new Text(String.valueOf(vectorPoint.getKey())), vectorPoint);
+            context.write(new IntWritable(id), new Text(serialize));
         }
     }
 }
