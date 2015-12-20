@@ -47,9 +47,11 @@ public class Constants {
 
     public static final String HDFS_INPUT_PATH = "hdfs://156.56.179.122:9000/input";
     public static final String HDFS_OUTPUT_PATH = "hdfs://156.56.179.122:9000/output/";
+    public static final String HDFS_HOME_PATH = "hdfs://156.56.179.122:9000/";
 
     public class Job {
         public static final String START_DATE = "start_date";
         public static final String END_DATE = "end_date";
+        public static final String NO_OF_DAYS = "no_of_days";
     }
 }

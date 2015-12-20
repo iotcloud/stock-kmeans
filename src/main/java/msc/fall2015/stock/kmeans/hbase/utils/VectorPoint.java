@@ -33,11 +33,12 @@ public class VectorPoint {
     }
 
     public VectorPoint(int key, int size) {
-        this(key, size, false);
+        this(key, null, size, false);
     }
 
-    public VectorPoint(int key, int size, boolean indexed) {
+    public VectorPoint(int key, String symbol, int size, boolean indexed) {
         this.key = key;
+        this.symbol = symbol;
         this.numbers = new double[size];
         for (int i = 0; i < numbers.length; i++) {
             numbers[i] = -1;
@@ -117,6 +118,10 @@ public class VectorPoint {
 
     public int getElements() {
         return elements;
+    }
+
+    public void setTotalCap(double totalCap) {
+        this.totalCap = totalCap;
     }
 
     public void setElements(int elements) {
@@ -440,6 +445,12 @@ public class VectorPoint {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    public boolean add(double number, int index) {
+        if (numbers[index] != -1) return false;
+        numbers[index] =number;
+        return true;
     }
 
     public boolean add(double number, double factorToAdjPrice, double factoToAdjVolume, CleanMetric metric, int index) {

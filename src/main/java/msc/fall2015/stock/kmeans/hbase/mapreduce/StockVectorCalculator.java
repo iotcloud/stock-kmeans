@@ -68,9 +68,6 @@ public class StockVectorCalculator {
             config.set("mapreduce.output.textoutputformat.separator", ",");
             TreeMap<String, List<Date>> genDates = TableUtils.genDates(TableUtils.getDate(startDate), TableUtils.getDate(endDate), mode);
             for (String id : genDates.keySet()){
-                Job job = new Job(config,"ExampleSummaryToFile");
-                job.setJarByClass(StockDataReaderMapper.class);     // class that contains mapper
-
                 Scan scan = new Scan();
                 scan.setCaching(500);        // 1 is the default in Scan, which will be bad for MapReduce jobs
                 scan.setCacheBlocks(false);  // don't set to true for MR jobs
@@ -78,9 +75,12 @@ public class StockVectorCalculator {
                 String start  = TableUtils.convertDateToString(dates.get(0));
                 String end  = TableUtils.convertDateToString(dates.get(1));
                 List<String> suitableDateList = TableUtils.getDates(start, end);
+                config.set(Constants.Job.NO_OF_DAYS, String.valueOf(suitableDateList.size()));
                 for (String date : suitableDateList){
                     scan.addColumn(Constants.STOCK_TABLE_CF_BYTES, date.getBytes());
                 }
+                Job job = new Job(config,"ExampleSummaryToFile");
+                job.setJarByClass(StockDataReaderMapper.class);
                 TableMapReduceUtil.initTableMapperJob(
                         Constants.STOCK_TABLE_NAME,        // input HBase table name
                         scan,             // Scan instance to control CF and attribute selection

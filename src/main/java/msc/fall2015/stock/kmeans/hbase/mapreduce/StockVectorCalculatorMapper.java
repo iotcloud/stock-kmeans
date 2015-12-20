@@ -27,12 +27,15 @@ public class StockVectorCalculatorMapper extends TableMapper<IntWritable, Text> 
      */
     private String endDate;
 
+    private int noOfDays;
+
     @Override
     protected void setup(Context context) throws IOException, InterruptedException {
         super.setup(context);
         Configuration conf = context.getConfiguration();
         startDate = conf.get(Constants.Job.START_DATE);
         endDate = conf.get(Constants.Job.END_DATE);
+        noOfDays = Integer.valueOf(conf.get(Constants.Job.NO_OF_DAYS));
     }
 
     /**
@@ -54,6 +57,8 @@ public class StockVectorCalculatorMapper extends TableMapper<IntWritable, Text> 
             String[] idKey = rowKey.split("_");
             int id = Integer.valueOf(idKey[0]);
             String symbol = idKey[1];
+            int index = 0;
+            VectorPoint vectorPoint = new VectorPoint(id, symbol, noOfDays, true);
             for (Map.Entry<byte[], NavigableMap<Long, byte[]>> entryVersion : columnFamilyMap.getValue().entrySet()) {
                 for (Map.Entry<Long, byte[]> entry : entryVersion.getValue().entrySet()) {
                     String column = Bytes.toString(entryVersion.getKey());
@@ -67,8 +72,8 @@ public class StockVectorCalculatorMapper extends TableMapper<IntWritable, Text> 
                             String cap = priceAndCap[1];
                             if (pr != null && !pr.equals("null")){
                                 double price = Double.valueOf(pr);
-                                priceList.add(price);
-                                System.out.println("Price : " + price + " count : " + count);
+                                vectorPoint.add(price, index);
+                                index++;
                             }
                             if (cap != null && !cap.equals("null")){
                                 totalCap += Double.valueOf(cap);
@@ -78,13 +83,7 @@ public class StockVectorCalculatorMapper extends TableMapper<IntWritable, Text> 
                 }
                 count++;
             }
-            double medianCap = totalCap / count;
-            double[] priceArr = new double[priceList.size()];
-            for (int i=0; i < priceList.size(); i++){
-                priceArr[i] = priceList.get(i);
-            }
-            VectorPoint vectorPoint = new VectorPoint(id,symbol, priceArr,totalCap);
-            vectorPoint.setElements(priceList.size());
+            vectorPoint.setTotalCap(totalCap);
             String serialize = null;
             if(vectorPoint.cleanVector(new CleanMetric())){
                 serialize = vectorPoint.serialize();

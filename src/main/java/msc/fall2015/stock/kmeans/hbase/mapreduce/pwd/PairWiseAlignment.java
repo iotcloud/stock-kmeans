@@ -113,14 +113,8 @@ public class PairWiseAlignment extends Configured implements Tool {
 		Job job = new Job(conf, "Pairwise-analysis");
 
 		/* create the base dir for this job. Delete and recreates if it exists */
-		Path hdMainDir;
-		if (args.length >= 4) {
-			hdMainDir = new Path(args[3]);
-		} else {
-			hdMainDir = new Path("swg-hadoop");
-		}
-
-		FileSystem fs = FileSystem.get(conf);
+		Path hdMainDir = new Path(msc.fall2015.stock.kmeans.utils.Constants.HDFS_HOME_PATH + "swg-hadoop");
+        FileSystem fs = FileSystem.get(conf);
 		fs.delete(hdMainDir, true);
 		Path hdInputDir = new Path(hdMainDir, "data");
 		if (!fs.mkdirs(hdInputDir)) {
@@ -238,6 +232,8 @@ public class PairWiseAlignment extends Configured implements Tool {
         Path path = new Path(sequenceFile);
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fs.open(path)));
 
+        System.out.println("noOfDivisions : " + noOfDivisions);
+        System.out.println("blockSize : " + blockSize);
 		for (int partNo = 0; partNo < noOfDivisions; partNo++) {
 			//
 			String filePartName = Constants.HDFS_SEQ_FILENAME + "_" + partNo;
@@ -250,16 +246,12 @@ public class PairWiseAlignment extends Configured implements Tool {
 					+ (partNo * blockSize) < noOfSequences)); sequenceIndex++) {
 				String line;
                 line = bufferedReader.readLine();
-                System.out.println(line);
                 if (line == null) {
 					throw new IOException(
 							"Cannot read the sequence from input file.");
 				}
 				// write the sequence name
 				bufferedWriter.write(line);
-				bufferedWriter.newLine();
-				// write the actual sequence
-				bufferedWriter.write(bufferedReader.readLine());
 				bufferedWriter.newLine();
 			}
 			bufferedWriter.flush();
