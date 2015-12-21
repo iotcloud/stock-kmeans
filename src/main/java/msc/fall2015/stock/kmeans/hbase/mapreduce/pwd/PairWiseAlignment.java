@@ -64,6 +64,7 @@ import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.filecache.DistributedCache;
@@ -96,7 +97,7 @@ public class PairWiseAlignment extends Configured implements Tool {
 	public int run(String[] args) throws Exception {
 		if (args.length < 2) {
 			System.err
-					.println("Usage:  <sequence_file> <sequence_count> <block_size> [hdfs_dir]");
+					.println("Usage:  <sequence_file> <sequence_count> <block_size> <weight>");
 			System.exit(2);
 		}
 
@@ -107,6 +108,8 @@ public class PairWiseAlignment extends Configured implements Tool {
 		int noOfSequences = Integer.parseInt(args[2]);
 //		int noOfSequences = 7322;
 		int blockSize = Integer.parseInt(args[3]);
+
+        boolean weightCalculate = Boolean.parseBoolean(args[4]);
 //		int blockSize = 7322;
 
 		Configuration conf = new Configuration();
@@ -156,6 +159,7 @@ public class PairWiseAlignment extends Configured implements Tool {
 		jobConf.setInt(Constants.BLOCK_SIZE, blockSize);
 		jobConf.setInt(Constants.NO_OF_DIVISIONS, noOfDivisions);
 		jobConf.setInt(Constants.NO_OF_SEQUENCES, noOfSequences);
+        jobConf.setBoolean(Constants.WEIGHT_ENABLED, weightCalculate);
 
 		job.setJarByClass(PairWiseAlignment.class);
 		job.setMapperClass(SWGMap.class);

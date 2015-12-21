@@ -78,6 +78,7 @@ public class SWGMap extends Mapper<LongWritable, Text, LongWritable, SWGWritable
 		Counter alignmentCounter = context
 				.getCounter(Constants.RecordCounters.ALIGNMENTS);
 
+
 		String valString = value.toString();
 		String valArgs[] = valString.split(Constants.BREAK);
 
@@ -92,6 +93,7 @@ public class SWGMap extends Mapper<LongWritable, Text, LongWritable, SWGWritable
 				blockSize * 10);
 		long noOfDivisions = conf.getLong(Constants.NO_OF_DIVISIONS,
 				noOfSequences / blockSize);
+        boolean weightEnabled = conf.getBoolean(Constants.WEIGHT_ENABLED, false);
 
 		long row = rowBlock * blockSize;
 		long column = columnBlock * blockSize;
@@ -125,17 +127,23 @@ public class SWGMap extends Mapper<LongWritable, Text, LongWritable, SWGWritable
 		for (int rowIndex = 0; ((rowIndex < blockSize) & ((row + rowIndex) < noOfSequences)); rowIndex++) {
 			int columnIndex = 0;
 			for (; ((columnIndex < blockSize) & ((column + columnIndex) < noOfSequences)); columnIndex++) {
-					// TODO: We use a default scoring matrix that comes with
-					// Jaligner.
-					double alignment = rowSequences.get(rowIndex).corr(colSequences.get(columnIndex));
+                // TODO: We use a default scoring matrix that comes with
+                // Jaligner.
 
-					// Get the identity and make it percent identity
-					short scaledScore = (short) (alignment * Short.MAX_VALUE);
+                double alignment = 0;
+                if (weightEnabled){
+                    alignment = rowSequences.get(rowIndex).weight(colSequences.get(columnIndex));
+                }else {
+                    alignment = rowSequences.get(rowIndex).corr(colSequences.get(columnIndex));
+                }
 
-					alignments[rowIndex][columnIndex] = scaledScore;
-					// System.out.print(row+rowIndex); //debug
+                // Get the identity and make it percent identity
+                short scaledScore = (short) (alignment * Short.MAX_VALUE);
+
+                alignments[rowIndex][columnIndex] = scaledScore;
+                // System.out.print(row+rowIndex); //debug
 //					 alignments[rowIndex][columnIndex] = (short)(column+columnIndex); //debug
-			}
+            }
 //			System.out.println("Processed Alignments :"+columnIndex);
 			alignmentCounter.increment(columnIndex);
 		}

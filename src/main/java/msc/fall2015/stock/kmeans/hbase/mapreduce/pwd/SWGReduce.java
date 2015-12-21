@@ -80,6 +80,7 @@ public class SWGReduce extends
 				blockSize * 10);
 		long noOfDivisions = conf.getLong(Constants.NO_OF_DIVISIONS,
 				noOfSequences / blockSize);
+        boolean weightEnabled = conf.getBoolean(Constants.WEIGHT_ENABLED, false);
 
 		// to handle the edge blocks with lesser number of sequences
 		int row = (int)(key.get() * blockSize);
@@ -127,8 +128,11 @@ public class SWGReduce extends
 
 		FileSystem fs = FileSystem.get(conf);
 		// out dir is created in the main driver.
-		Path outFilePart = new Path(outDir, "rowblock_" + key.get()
-				+ "_blockSize_" + blockSize);
+        String childName = "rowblock_cor_" + key.get()+ "_blockSize_" + blockSize;
+        if (weightEnabled){
+            childName = "rowblock_weight_" + key.get()+ "_blockSize_" + blockSize;
+        }
+		Path outFilePart = new Path(outDir, childName);
 		writeOutFile(alignments, fs, outFilePart);
 		System.out.println("Reduce Processing Time: "+((System.nanoTime()-startTime)/1000000));
 	}
