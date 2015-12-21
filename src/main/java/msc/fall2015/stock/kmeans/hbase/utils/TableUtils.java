@@ -37,18 +37,13 @@ public class TableUtils {
     }
 
     public static Date getDate (String date) throws ParseException {
-        System.out.println(date);
         DateFormat df = new SimpleDateFormat("yyyyMMdd");
-        Date parse = df.parse(date);
-        System.out.println(parse);
-        return parse;
+        return df.parse(date);
     }
 
     public static String convertDateToString (Date date) throws ParseException {
-        System.out.println(date);
         DateFormat df = new SimpleDateFormat("yyyyMMdd");
-        String format = df.format(date);
-        return format;
+        return df.format(date);
     }
 
     private static ResultScanner getScannerForDateTable() {
