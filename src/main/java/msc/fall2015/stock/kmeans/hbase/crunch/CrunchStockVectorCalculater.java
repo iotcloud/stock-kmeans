@@ -92,7 +92,6 @@ public class CrunchStockVectorCalculater extends Configured implements Tool, Ser
                 List<String> suitableDateList = TableUtils.getDates(start, end);
                 hbaseConfig.set(Constants.Job.NO_OF_DAYS, String.valueOf(suitableDateList.size()));
                 getConf().addResource(hbaseConfig);
-//                hbaseConfig.addResource(conf);
 
                 for (String date : suitableDateList){
                     scan.addColumn(Constants.STOCK_TABLE_CF_BYTES, date.getBytes());
@@ -112,7 +111,6 @@ public class CrunchStockVectorCalculater extends Configured implements Tool, Ser
     }
 
     public PTable<String, String> extractText(final PTable<ImmutableBytesWritable, Result> tableContent) {
-        final Configuration configuration = tableContent.getPipeline().getConfiguration();
         return tableContent.parallelDo("Read data", new DoFn<Pair<ImmutableBytesWritable, Result>, Pair<String, String>>() {
             transient VectorPoint vectorPoint;
             int noOfDays;

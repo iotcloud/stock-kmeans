@@ -81,14 +81,10 @@ public class CrunchStockDataReader extends Configured implements Tool, Serializa
             scan.setCacheBlocks(false);  // don't set to true for MR jobs
             List<String> suitableDates = getDates();
             if (suitableDates != null && !suitableDates.isEmpty()){
-                System.out.println("******* Date Count : " + suitableDates.size());
                 for (String date : suitableDates){
                     scan.addColumn(Constants.STOCK_TABLE_CF_BYTES, date.getBytes());
                 }
-                System.out.println("************ dates added to scan *********");
             }
-//            getRows(scan, suitableDates);
-
             createTable();
             // Our hbase source
             HBaseSourceTarget source = new HBaseSourceTarget(Constants.STOCK_TABLE_NAME, scan);
@@ -250,12 +246,10 @@ public class CrunchStockDataReader extends Configured implements Tool, Serializa
         return tableContent.parallelDo("Read data", new DoFn<Pair<ImmutableBytesWritable, Result>, Pair<String, String>>() {
             @Override
             public void process(Pair<ImmutableBytesWritable, Result> row, Emitter<Pair<String, String>> emitter) {
-                System.out.println("********** at process method ***********");
                 SimpleRegression regression;
                 NavigableMap<byte[], NavigableMap<byte[], NavigableMap<Long, byte[]>>> map = row.second().getMap();
                 System.out.println(map.size());
                 for (Map.Entry<byte[], NavigableMap<byte[], NavigableMap<Long, byte[]>>> columnFamilyMap : map.entrySet()) {
-                    System.out.println("********** at process method ***********");
                     regression = new SimpleRegression();
                     int count = 1;
                     for (Map.Entry<byte[], NavigableMap<Long, byte[]>> entryVersion : columnFamilyMap.getValue().entrySet()) {

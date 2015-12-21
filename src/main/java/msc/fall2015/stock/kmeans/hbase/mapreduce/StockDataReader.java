@@ -67,7 +67,6 @@ public class StockDataReader {
             scan.setCacheBlocks(false);  // don't set to true for MR jobs
             List<String> suitableDates = TableUtils.getDates(startDate, endDate);
             if (suitableDates != null && !suitableDates.isEmpty()){
-                System.out.println("******* Date Count : " + suitableDates.size());
                 for (String date : suitableDates){
                     scan.addColumn(Constants.STOCK_TABLE_CF_BYTES, date.getBytes());
                 }

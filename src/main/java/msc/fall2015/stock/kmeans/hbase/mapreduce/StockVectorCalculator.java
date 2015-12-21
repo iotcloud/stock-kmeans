@@ -99,11 +99,14 @@ public class StockVectorCalculator {
             log.error("Error while parsing date", e);
             throw new RuntimeException("Error while parsing date", e);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error("Error while creating the job", e);
+            throw new RuntimeException("Error while creating the job", e);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            log.error("Error while creating the job", e);
+            throw new RuntimeException("Error while creating the job", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error while creating the job", e);
+            throw new RuntimeException("Error while creating the job", e);
         }
     }
 }

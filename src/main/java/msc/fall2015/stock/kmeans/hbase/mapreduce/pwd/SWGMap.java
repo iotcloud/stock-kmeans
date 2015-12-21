@@ -77,8 +77,6 @@ public class SWGMap extends Mapper<LongWritable, Text, LongWritable, SWGWritable
 		Configuration conf = context.getConfiguration();
 		Counter alignmentCounter = context
 				.getCounter(Constants.RecordCounters.ALIGNMENTS);
-
-
 		String valString = value.toString();
 		String valArgs[] = valString.split(Constants.BREAK);
 
@@ -100,14 +98,11 @@ public class SWGMap extends Mapper<LongWritable, Text, LongWritable, SWGWritable
 
 		long parseStartTime = System.nanoTime();
 		FileSystem fs = FileSystem.getLocal(conf);
-
 		// parse the inputFilePart for row
 		Path rowPath = new Path(Constants.HDFS_SEQ_FILENAME + "_" + rowBlock);
 		FSDataInputStream rowInStream = fs.open(rowPath);
 		List<VectorPoint> rowSequences;
 		rowSequences = SequenceParser.ParseFile(rowInStream);
-
-
 		// parse the inputFilePart for column if this is not a diagonal block
 		List<VectorPoint> colSequences;
 		if (isDiagonal) {
@@ -119,7 +114,6 @@ public class SWGMap extends Mapper<LongWritable, Text, LongWritable, SWGWritable
 			FSDataInputStream colInStream = fs.open(colPath);
 			colSequences = SequenceParser.ParseFile(colInStream);
 		}
-
 		System.out.println("Parsing time : "
 				+ ((System.nanoTime() - parseStartTime) / 1000000) + "ms");
 
@@ -127,9 +121,6 @@ public class SWGMap extends Mapper<LongWritable, Text, LongWritable, SWGWritable
 		for (int rowIndex = 0; ((rowIndex < blockSize) & ((row + rowIndex) < noOfSequences)); rowIndex++) {
 			int columnIndex = 0;
 			for (; ((columnIndex < blockSize) & ((column + columnIndex) < noOfSequences)); columnIndex++) {
-                // TODO: We use a default scoring matrix that comes with
-                // Jaligner.
-
                 double alignment = 0;
                 if (weightEnabled){
                     alignment = rowSequences.get(rowIndex).weight(colSequences.get(columnIndex));
@@ -139,12 +130,8 @@ public class SWGMap extends Mapper<LongWritable, Text, LongWritable, SWGWritable
 
                 // Get the identity and make it percent identity
                 short scaledScore = (short) (alignment * Short.MAX_VALUE);
-
                 alignments[rowIndex][columnIndex] = scaledScore;
-                // System.out.print(row+rowIndex); //debug
-//					 alignments[rowIndex][columnIndex] = (short)(column+columnIndex); //debug
             }
-//			System.out.println("Processed Alignments :"+columnIndex);
 			alignmentCounter.increment(columnIndex);
 		}
 
@@ -161,7 +148,6 @@ public class SWGMap extends Mapper<LongWritable, Text, LongWritable, SWGWritable
 			inverseDataWritable.setAlignments(alignments);
 			context.write(new LongWritable(columnBlock), inverseDataWritable);
 		}
-
 		System.out.println("Map time : "
 				+ ((System.nanoTime() - startTime) / 1000000) + "ms");
 	}

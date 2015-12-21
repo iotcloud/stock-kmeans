@@ -58,8 +58,6 @@ public class CrunchStockAllDataInserter extends Configured implements Tool, Seri
                 "PipelineWithFilterFn", config);
         PCollection<String> lines = pipeline.readTextFile(Constants.HDFS_INPUT_PATH + "/2004_2014.csv");
         PCollection<Put> resultPut = CrunchUtils.returnRows(lines);
-        System.out.println("********** size ************ : " + resultPut.getSize() );
-
         pipeline.write(resultPut, new HBaseTarget(Constants.STOCK_TABLE_NAME));
         PipelineResult result = pipeline.done();
         return result.succeeded() ? 0 : 1;
